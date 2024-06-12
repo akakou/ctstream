@@ -3,8 +3,12 @@ package ctstream
 import (
 	"time"
 
+	"github.com/google/certificate-transparency-go/client"
 	"github.com/google/certificate-transparency-go/jsonclient"
+	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
+
+type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
 
 type CTStream struct {
 	streams []*singleStream
@@ -48,7 +52,12 @@ func (stream *CTStream) Next(callback Callback) {
 		first := s.first
 
 		for _, entry := range entries {
-			go callback(entry.Precert, first+entry.Index, s.LogClient, err)
+			cert, err2 := ExtractCertFromEntry(&entry)
+			if err2 != nil {
+				panic(err2)
+			}
+
+			go callback(cert, first+entry.Index, s.LogClient, err)
 		}
 	}
 
