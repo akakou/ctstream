@@ -43,12 +43,12 @@ func (stream *CTStream) Init() error {
 }
 
 func (stream *CTStream) Next(callback Callback) {
-	for _, m := range stream.streams {
-		entries, err := m.next()
-		first := m.first
+	for _, s := range stream.streams {
+		entries, err := s.next()
+		first := s.first
 
 		for _, entry := range entries {
-			go callback(entry.Precert, first+entry.Index, err)
+			go callback(entry.Precert, first+entry.Index, s.LogClient, err)
 		}
 	}
 

@@ -12,7 +12,7 @@ import (
 )
 
 type LogID = int64
-type Callback func(*ct.Precertificate, LogID, error)
+type Callback func(*ct.Precertificate, LogID, *client.LogClient, error)
 
 type singleStream struct {
 	Url string

@@ -7,6 +7,7 @@ import (
 
 	ctstream "github.com/akakou/ctstream"
 	ct "github.com/google/certificate-transparency-go"
+	"github.com/google/certificate-transparency-go/client"
 )
 
 func main() {
@@ -53,11 +54,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	m.Run(func(cert *ct.Precertificate, i ctstream.LogID, err error) {
+	m.Run(func(cert *ct.Precertificate, i ctstream.LogID, c *client.LogClient, err error) {
 		if err != nil {
 			fmt.Printf("Failed to fetch %v: \n", err)
 		}
 
-		fmt.Printf("%v: %v\n", i, cert.TBSCertificate.DNSNames)
+		fmt.Printf("%v(%v): %v\n", c.BaseURI(), i, cert.TBSCertificate.DNSNames)
 	})
 }
