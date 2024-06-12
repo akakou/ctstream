@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	ctstream "github.com/akakou/ct-stream"
+	ctstream "github.com/akakou/ctstream"
 	ct "github.com/google/certificate-transparency-go"
 )
 

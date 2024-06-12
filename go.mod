@@ -1,4 +1,4 @@
-module github.com/akakou/ct-stream
+module github.com/akakou/ctstream
 
 go 1.21.9
 
