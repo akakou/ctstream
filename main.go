@@ -1,3 +1,0 @@
-package ctstream
-
-func main(){}
