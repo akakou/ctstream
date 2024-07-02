@@ -70,7 +70,8 @@ func (stream *singleStream) next() ([]ct.LogEntry, error) {
 		}
 	}
 
-	stream.first = int64(sct.TreeSize)
+	last := logEntries[len(logEntries)-1]
+	stream.first = int64(last.Index + 1)
 
 	return result, nil
 }
