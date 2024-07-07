@@ -13,6 +13,7 @@ type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
 type CTStream struct {
 	streams []*singleStream
 	Sleep   time.Duration
+	stop    bool
 }
 
 func New(urls []string, sleep time.Duration) (*CTStream, error) {
@@ -30,6 +31,7 @@ func New(urls []string, sleep time.Duration) (*CTStream, error) {
 	stream := CTStream{
 		streams: streams,
 		Sleep:   sleep,
+		stop:    false,
 	}
 
 	return &stream, nil
@@ -67,5 +69,13 @@ func (stream *CTStream) Next(callback Callback) {
 func (stream *CTStream) Run(callback Callback) {
 	for {
 		stream.Next(callback)
+
+		if stream.stop {
+			break
+		}
 	}
+}
+
+func (stream *CTStream) Stop() {
+	stream.stop = true
 }
