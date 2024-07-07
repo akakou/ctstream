@@ -11,9 +11,10 @@ import (
 type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
 
 type CTStream struct {
-	streams []*singleStream
-	Sleep   time.Duration
-	stop    bool
+	streams      []*singleStream
+	Sleep        time.Duration
+	stop         bool
+	MaxEntrySize int
 }
 
 func New(urls []string, sleep time.Duration) (*CTStream, error) {
@@ -50,7 +51,7 @@ func (stream *CTStream) Init() error {
 
 func (stream *CTStream) Next(callback Callback) {
 	for _, s := range stream.streams {
-		entries, err := s.next()
+		entries, err1 := s.next()
 		first := s.first
 
 		for _, entry := range entries {
@@ -59,7 +60,7 @@ func (stream *CTStream) Next(callback Callback) {
 				panic(err2)
 			}
 
-			go callback(cert, first+entry.Index, s.LogClient, err)
+			go callback(cert, first+entry.Index, s.LogClient, err1)
 		}
 	}
 
