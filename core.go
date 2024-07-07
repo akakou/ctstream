@@ -17,11 +17,12 @@ type singleStream struct {
 	Url string
 	*client.LogClient
 	context.Context
-	first LogID
-	opts  jsonclient.Options
+	first        LogID
+	opts         jsonclient.Options
+	maxEntrySize int64
 }
 
-func newSingleStream(url string, ops jsonclient.Options) (*singleStream, error) {
+func newSingleStream(url string, maxEntrySize int64, ops jsonclient.Options) (*singleStream, error) {
 	hc := http.Client{}
 	ctx := context.Background()
 
@@ -31,10 +32,11 @@ func newSingleStream(url string, ops jsonclient.Options) (*singleStream, error) 
 	}
 
 	return &singleStream{
-		Url:       url,
-		LogClient: c,
-		Context:   ctx,
-		opts:      ops,
+		Url:          url,
+		LogClient:    c,
+		Context:      ctx,
+		maxEntrySize: maxEntrySize,
+		opts:         ops,
 	}, nil
 }
 
@@ -49,7 +51,6 @@ func (stream *singleStream) init() error {
 }
 
 func (stream *singleStream) next() ([]ct.LogEntry, error) {
-	result := []ct.LogEntry{}
 	sct, err := stream.LogClient.GetSTH(stream.Context)
 	if err != nil {
 		return []ct.LogEntry{}, errors.New(ERROR_FAILED_TO_FETCH_STH)
@@ -59,19 +60,18 @@ func (stream *singleStream) next() ([]ct.LogEntry, error) {
 		return []ct.LogEntry{}, errors.New(ERROR_NEW_LOGS_NOT_FOUND)
 	}
 
-	logEntries, err := stream.LogClient.GetEntries(stream.Context, stream.first, LogID(sct.TreeSize))
+	last := sct.TreeSize
+	if sct.TreeSize > uint64(stream.first+stream.maxEntrySize) {
+		last = uint64(stream.first + stream.maxEntrySize)
+	}
+
+	logEntries, err := stream.LogClient.GetEntries(stream.Context, stream.first, LogID(last))
 	if err != nil {
 		return []ct.LogEntry{}, errors.New(ERROR_FAILED_TO_FETCH_STH)
 	}
 
-	for _, entry := range logEntries {
-		if entry.Precert != nil {
-			result = append(result, entry)
-		}
-	}
+	nextFirst := logEntries[len(logEntries)-1]
+	stream.first = int64(nextFirst.Index + 1)
 
-	last := logEntries[len(logEntries)-1]
-	stream.first = int64(last.Index + 1)
-
-	return result, nil
+	return logEntries, nil
 }

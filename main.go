@@ -8,6 +8,8 @@ import (
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
+const DEFAULT_MAX_ENTRIES = 32
+
 type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
 
 type CTStream struct {
@@ -17,11 +19,11 @@ type CTStream struct {
 	MaxEntrySize int
 }
 
-func New(urls []string, sleep time.Duration) (*CTStream, error) {
+func New(urls []string, maxEntrySize int64, sleep time.Duration) (*CTStream, error) {
 	streams := []*singleStream{}
 
 	for _, url := range urls {
-		stream, err := newSingleStream(url, jsonclient.Options{})
+		stream, err := newSingleStream(url, maxEntrySize, jsonclient.Options{})
 		if err != nil {
 			return nil, err
 		}
@@ -38,6 +40,10 @@ func New(urls []string, sleep time.Duration) (*CTStream, error) {
 	return &stream, nil
 }
 
+func Default(urls []string, sleep time.Duration) (*CTStream, error) {
+	return New(urls, DEFAULT_MAX_ENTRIES, sleep)
+}
+
 func (stream *CTStream) Init() error {
 	for _, stream := range stream.streams {
 		err := stream.init()
@@ -52,7 +58,6 @@ func (stream *CTStream) Init() error {
 func (stream *CTStream) Next(callback Callback) {
 	for _, s := range stream.streams {
 		entries, err1 := s.next()
-		first := s.first
 
 		for _, entry := range entries {
 			cert, err2 := ExtractCertFromEntry(&entry)
@@ -60,7 +65,7 @@ func (stream *CTStream) Next(callback Callback) {
 				panic(err2)
 			}
 
-			go callback(cert, first+entry.Index, s.LogClient, err1)
+			go callback(cert, entry.Index, s.LogClient, err1)
 		}
 	}
 
