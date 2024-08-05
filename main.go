@@ -8,7 +8,7 @@ import (
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
-const DEFAULT_MAX_ENTRIES = 32
+const DEFAULT_MAX_ENTRIES = 256
 
 type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
 
