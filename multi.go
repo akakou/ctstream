@@ -46,27 +46,30 @@ func (stream *CTsStream) Init() error {
 	return nil
 }
 
-func (stream *CTsStream) Next(callback Callback) {
-	for _, s := range stream.streams {
-		go s.Next(callback)
-	}
-}
-
-func (stream *CTsStream) Run(callback Callback, sleep time.Duration) {
+func (stream *CTsStream) Start(callback Callback, sleep time.Duration) {
 	stream.stop = false
 	stream.Sleep = sleep
 
-	for {
-		stream.Next(callback)
+	for _, s := range stream.streams {
+		go s.Run(callback, sleep)
+	}
+}
 
-		if stream.stop {
-			break
-		}
-
+func (stream *CTsStream) Await() {
+	for !stream.stop {
 		time.Sleep(stream.Sleep)
 	}
 }
 
+func (stream *CTsStream) Run(callback Callback, sleep time.Duration) {
+	stream.Start(callback, sleep)
+	stream.Await()
+}
+
 func (stream *CTsStream) Stop() {
 	stream.stop = true
+
+	for _, s := range stream.streams {
+		s.Stop()
+	}
 }

@@ -13,8 +13,17 @@ import (
 
 func main() {
 	m, err := ctstream.DefaultCTsStream([]string{
-		"https://oak.ct.letsencrypt.org/2024h2/",
+		"https://ct.googleapis.com/logs/us1/argon2024/",
+		"https://ct.googleapis.com/logs/eu1/xenon2024/",
+		"https://ct.cloudflare.com/logs/nimbus2024/",
+		"https://yeti2024.ct.digicert.com/log/",
+		"https://nessie2024.ct.digicert.com/log/",
+		"https://wyvern.ct.digicert.com/2024h2/",
+		"https://sphinx.ct.digicert.com/2024h2/",
+		"https://sabre2024h2.ct.sectigo.com/",
 		"https://mammoth2024h2.ct.sectigo.com/",
+		"https://oak.ct.letsencrypt.org/2024h2/",
+		"https://ct2024.trustasia.com/log2024/",
 	})
 
 	if err != nil {
