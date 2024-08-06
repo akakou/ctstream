@@ -3,7 +3,6 @@ package ctstream
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"errors"
 
@@ -26,8 +25,6 @@ type CTClient struct {
 	first        LogID
 	opts         jsonclient.Options
 	maxEntrySize int64
-	stop         bool
-	Sleep        time.Duration
 }
 
 func NewCTClient(url string, maxEntrySize int64, ops jsonclient.Options) (*CTClient, error) {
