@@ -14,7 +14,7 @@ import (
 
 type LogID = int64
 
-const DEFAULT_MAX_ENTRIES = 256
+var DefaultMaxEntries int64 = 256
 
 type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
 
@@ -46,7 +46,7 @@ func NewCTClient(url string, maxEntrySize int64, ops jsonclient.Options) (*CTCli
 }
 
 func DefaultCTClient(url string) (*CTClient, error) {
-	return NewCTClient(url, DEFAULT_MAX_ENTRIES, jsonclient.Options{})
+	return NewCTClient(url, DefaultMaxEntries, jsonclient.Options{})
 }
 
 func (stream *CTClient) Init() error {
