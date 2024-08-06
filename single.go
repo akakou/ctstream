@@ -40,7 +40,7 @@ func (stream *CTStream) Next(callback Callback) {
 		cert, err2 := extractCertFromEntry(&entry)
 		err := errors.Join(err1, err2)
 
-		go callback(cert, entry.Index, stream.Client.LogClient, err)
+		callback(cert, entry.Index, stream.Client.LogClient, err)
 	}
 }
 
