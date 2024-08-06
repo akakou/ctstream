@@ -5,14 +5,14 @@ import (
 )
 
 type CTsStream struct {
-	streams []*CTStream
+	Streams []*CTStream
 	Sleep   time.Duration
 	stop    bool
 }
 
 func NewCTsStream(streams []*CTStream) (*CTsStream, error) {
 	return &CTsStream{
-		streams: streams,
+		Streams: streams,
 	}, nil
 }
 
@@ -29,14 +29,14 @@ func DefaultCTsStream(urls []string) (*CTsStream, error) {
 	}
 
 	stream := CTsStream{
-		streams: streams,
+		Streams: streams,
 	}
 
 	return &stream, nil
 }
 
 func (stream *CTsStream) Init() error {
-	for _, stream := range stream.streams {
+	for _, stream := range stream.Streams {
 		err := stream.Init()
 		if err != nil {
 			return err
@@ -50,7 +50,7 @@ func (stream *CTsStream) Start(callback Callback, sleep time.Duration) {
 	stream.stop = false
 	stream.Sleep = sleep
 
-	for _, s := range stream.streams {
+	for _, s := range stream.Streams {
 		go s.Run(callback, sleep)
 	}
 }
@@ -69,7 +69,7 @@ func (stream *CTsStream) Run(callback Callback, sleep time.Duration) {
 func (stream *CTsStream) Stop() {
 	stream.stop = true
 
-	for _, s := range stream.streams {
+	for _, s := range stream.Streams {
 		s.Stop()
 	}
 }
