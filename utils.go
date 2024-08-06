@@ -7,7 +7,7 @@ import (
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
-func ExtractCertFromEntry(entry *ct.LogEntry) (*ctx509.Certificate, error) {
+func extractCertFromEntry(entry *ct.LogEntry) (*ctx509.Certificate, error) {
 	var ctCert *ctx509.Certificate
 	var err error
 

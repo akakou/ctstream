@@ -12,9 +12,10 @@ import (
 )
 
 func main() {
-	m, err := ctstream.Default([]string{
+	m, err := ctstream.DefaultCTsStream([]string{
 		"https://oak.ct.letsencrypt.org/2024h2/",
-	}, 100*time.Millisecond)
+		"https://mammoth2024h2.ct.sectigo.com/",
+	})
 
 	if err != nil {
 		fmt.Printf("Failed to create new ctstream")
@@ -34,5 +35,5 @@ func main() {
 
 		fmt.Printf("%d, %s\n", i, cert.DNSNames)
 		fmt.Printf("%v%v?start=%v&end=%v\n\n", c.BaseURI(), ct.GetEntriesPath, i, i)
-	})
+	}, 1000*time.Millisecond)
 }
