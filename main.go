@@ -1,6 +1,7 @@
 package ctstream
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/certificate-transparency-go/client"
@@ -55,18 +56,20 @@ func (stream *CTStream) Init() error {
 	return nil
 }
 
+func (stream *CTStream) next(s *singleStream, callback Callback) {
+	entries, err1 := s.next()
+
+	for _, entry := range entries {
+		cert, err2 := ExtractCertFromEntry(&entry)
+		err := errors.Join(err1, err2)
+
+		go callback(cert, entry.Index, s.LogClient, err)
+	}
+}
+
 func (stream *CTStream) Next(callback Callback) {
 	for _, s := range stream.streams {
-		entries, err1 := s.next()
-
-		for _, entry := range entries {
-			cert, err2 := ExtractCertFromEntry(&entry)
-			if err2 != nil {
-				panic(err2)
-			}
-
-			go callback(cert, entry.Index, s.LogClient, err1)
-		}
+		go stream.next(s, callback)
 	}
 
 	time.Sleep(stream.Sleep)
