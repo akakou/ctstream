@@ -3,26 +3,34 @@ package ctstream
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"errors"
 
 	ct "github.com/google/certificate-transparency-go"
 	"github.com/google/certificate-transparency-go/client"
 	"github.com/google/certificate-transparency-go/jsonclient"
+	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
 type LogID = int64
 
-type singleStream struct {
+const DEFAULT_MAX_ENTRIES = 256
+
+type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
+
+type CTClient struct {
 	Url string
 	*client.LogClient
 	context.Context
 	first        LogID
 	opts         jsonclient.Options
 	maxEntrySize int64
+	stop         bool
+	Sleep        time.Duration
 }
 
-func newSingleStream(url string, maxEntrySize int64, ops jsonclient.Options) (*singleStream, error) {
+func NewCTClient(url string, maxEntrySize int64, ops jsonclient.Options) (*CTClient, error) {
 	hc := http.Client{}
 	ctx := context.Background()
 
@@ -31,7 +39,7 @@ func newSingleStream(url string, maxEntrySize int64, ops jsonclient.Options) (*s
 		return nil, errors.New(ERROR_FAILED_TO_NEW)
 	}
 
-	return &singleStream{
+	return &CTClient{
 		Url:          url,
 		LogClient:    c,
 		Context:      ctx,
@@ -40,7 +48,11 @@ func newSingleStream(url string, maxEntrySize int64, ops jsonclient.Options) (*s
 	}, nil
 }
 
-func (stream *singleStream) init() error {
+func DefaultCTClient(url string) (*CTClient, error) {
+	return NewCTClient(url, DEFAULT_MAX_ENTRIES, jsonclient.Options{})
+}
+
+func (stream *CTClient) Init() error {
 	sct, err := stream.GetSTH(stream.Context)
 	if err != nil {
 		return errors.New(ERROR_FAILED_TO_FETCH_STH)
@@ -50,7 +62,7 @@ func (stream *singleStream) init() error {
 	return nil
 }
 
-func (stream *singleStream) next() ([]ct.LogEntry, error) {
+func (stream *CTClient) Next() ([]ct.LogEntry, error) {
 	sct, err := stream.LogClient.GetSTH(stream.Context)
 	if err != nil {
 		return []ct.LogEntry{}, errors.New(ERROR_FAILED_TO_FETCH_STH)
