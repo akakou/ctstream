@@ -44,13 +44,12 @@ func (stream *CTsStream) Init() error {
 
 func (stream *CTsStream) Start(callback Callback) {
 	for _, s := range stream.Streams {
-		go s.Run(callback)
+		s.Start(callback)
 	}
 }
 
 func (stream *CTsStream) Await() {
 	for _, s := range stream.Streams {
-		time.Sleep(stream.Sleep)
 		s.Await()
 	}
 }

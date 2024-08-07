@@ -56,19 +56,27 @@ func (stream *CTStream) Next(callback Callback) {
 	}
 }
 
-func (stream *CTStream) Run(callback Callback) {
-	stream.Wg.Add(1)
-	defer stream.Wg.Done()
-
+func (stream *CTStream) start(callback Callback) {
 	for {
 		select {
 		case <-stream.Ctx.Done():
+			stream.Wg.Done()
 			return
 		default:
 			stream.Next(callback)
 			time.Sleep(stream.Sleep)
 		}
 	}
+}
+
+func (stream *CTStream) Start(callback Callback) {
+	stream.Wg.Add(1)
+	go stream.start(callback)
+}
+
+func (stream *CTStream) Run(callback Callback) {
+	stream.Start(callback)
+	stream.Await()
 }
 
 func (stream *CTStream) Await() {
