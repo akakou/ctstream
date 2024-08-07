@@ -50,6 +50,7 @@ func (stream *CTsStream) Start(callback Callback) {
 
 func (stream *CTsStream) Await() {
 	for _, s := range stream.Streams {
+		time.Sleep(stream.Sleep)
 		s.Await()
 	}
 }
