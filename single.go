@@ -1,19 +1,27 @@
 package ctstream
 
 import (
+	"context"
 	"errors"
+	"sync"
 	"time"
 )
+
+var DefaultSleep = 1 * time.Second
 
 type CTStream struct {
 	Client *CTClient
 	Sleep  time.Duration
-	stop   bool
+	Ctx    context.Context
+	Wg     sync.WaitGroup
 }
 
-func NewCTStream(client *CTClient) (*CTStream, error) {
+func NewCTStream(client *CTClient, sleep time.Duration, Ctx context.Context) (*CTStream, error) {
 	return &CTStream{
 		Client: client,
+		Sleep:  sleep,
+		Ctx:    Ctx,
+		Wg:     sync.WaitGroup{},
 	}, nil
 }
 
@@ -25,7 +33,8 @@ func DefaultCTStream(url string) (*CTStream, error) {
 
 	return &CTStream{
 		Client: client,
-		stop:   false,
+		Sleep:  DefaultSleep,
+		Ctx:    context.Background(),
 	}, nil
 }
 
@@ -44,21 +53,25 @@ func (stream *CTStream) Next(callback Callback) {
 	}
 }
 
-func (stream *CTStream) Run(callback Callback, sleep time.Duration) {
-	stream.stop = false
-	stream.Sleep = sleep
+func (stream *CTStream) Run(callback Callback) {
+	stream.Wg.Add(1)
+	defer stream.Wg.Done()
 
 	for {
-		stream.Next(callback)
-
-		if stream.stop {
-			break
+		select {
+		case <-stream.Ctx.Done():
+			return
+		default:
+			stream.Next(callback)
+			time.Sleep(stream.Sleep)
 		}
-
-		time.Sleep(stream.Sleep)
 	}
 }
 
+func (stream *CTStream) Await() {
+	stream.Wg.Wait()
+}
+
 func (stream *CTStream) Stop() {
-	stream.stop = true
+	stream.Ctx.Done()
 }
