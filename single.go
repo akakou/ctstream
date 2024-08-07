@@ -28,7 +28,7 @@ func NewCTStream(client *CTClient, sleep time.Duration, Ctx context.Context) (*C
 	}, nil
 }
 
-func DefaultCTStream(url string) (*CTStream, error) {
+func DefaultCTStream(url string, ctx context.Context) (*CTStream, error) {
 	client, err := DefaultCTClient(url)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func DefaultCTStream(url string) (*CTStream, error) {
 	return NewCTStream(
 		client,
 		DefaultSleep,
-		context.Background(),
+		ctx,
 	)
 }
 

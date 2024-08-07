@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -24,7 +25,7 @@ func main() {
 		"https://mammoth2024h2.ct.sectigo.com/",
 		"https://oak.ct.letsencrypt.org/2024h2/",
 		"https://ct2024.trustasia.com/log2024/",
-	})
+	}, context.Background())
 
 	if err != nil {
 		fmt.Printf("Failed to create new ctstream")

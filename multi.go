@@ -1,6 +1,7 @@
 package ctstream
 
 import (
+	"context"
 	"time"
 )
 
@@ -16,11 +17,18 @@ func NewCTsStream(streams []*CTStream, sleep time.Duration) (*CTsStream, error) 
 	}, nil
 }
 
-func DefaultCTsStream(urls []string) (*CTsStream, error) {
+func SemiDefaultCTsStream(streams []*CTStream, sleep time.Duration) (*CTsStream, error) {
+	return &CTsStream{
+		Streams: streams,
+		Sleep:   sleep,
+	}, nil
+}
+
+func DefaultCTsStream(urls []string, ctx context.Context) (*CTsStream, error) {
 	streams := []*CTStream{}
 
 	for _, url := range urls {
-		stream, err := DefaultCTStream(url)
+		stream, err := DefaultCTStream(url, ctx)
 		if err != nil {
 			return nil, err
 		}
