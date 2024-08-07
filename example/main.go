@@ -37,7 +37,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	m.Start(func(cert *ctX509.Certificate, i ctstream.LogID, c *client.LogClient, err error) {
+	m.Run(func(cert *ctX509.Certificate, i ctstream.LogID, c *client.LogClient, err error) {
 		if err != nil {
 			fmt.Printf("Failed to fetch %v: \n", err)
 		}
@@ -46,7 +46,8 @@ func main() {
 		fmt.Printf("%v%v?start=%v&end=%v\n\n", c.BaseURI(), ct.GetEntriesPath, i, i)
 	}, 1000*time.Millisecond)
 
-	time.Sleep(10 * time.Second)
+	// m.SetTimeout(10 * time.Second)
 
-	m.Stop()
+	// m.Await()
+
 }
