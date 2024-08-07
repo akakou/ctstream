@@ -45,8 +45,6 @@ func main() {
 		fmt.Printf("%v%v?start=%v&end=%v\n\n", c.BaseURI(), ct.GetEntriesPath, i, i)
 	})
 
-	m.SetTimeout(-1)
-
 	m.Await()
 
 }

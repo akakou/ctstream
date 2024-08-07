@@ -65,9 +65,3 @@ func (stream *CTsStream) Stop() {
 		s.Stop()
 	}
 }
-
-func (stream *CTsStream) SetTimeout(t time.Duration) {
-	for _, s := range stream.Streams {
-		s.SetTimeout(t)
-	}
-}
