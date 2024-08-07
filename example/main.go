@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	ctstream "github.com/akakou/ctstream"
 	ct "github.com/google/certificate-transparency-go"
@@ -44,6 +45,11 @@ func main() {
 		fmt.Printf("%d, %s\n", i, cert.DNSNames)
 		fmt.Printf("%v%v?start=%v&end=%v\n\n", c.BaseURI(), ct.GetEntriesPath, i, i)
 	})
+
+	go func() {
+		time.Sleep(10 * time.Second)
+		m.Stop()
+	}()
 
 	m.Await()
 

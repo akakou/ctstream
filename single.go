@@ -14,13 +14,16 @@ type CTStream struct {
 	Sleep  time.Duration
 	Ctx    context.Context
 	Wg     sync.WaitGroup
+	cancel context.CancelFunc
 }
 
 func NewCTStream(client *CTClient, sleep time.Duration, Ctx context.Context) (*CTStream, error) {
+	ctx, cancel := context.WithCancel(Ctx)
 	return &CTStream{
 		Client: client,
 		Sleep:  sleep,
-		Ctx:    Ctx,
+		Ctx:    ctx,
+		cancel: cancel,
 		Wg:     sync.WaitGroup{},
 	}, nil
 }
@@ -73,5 +76,5 @@ func (stream *CTStream) Await() {
 }
 
 func (stream *CTStream) Stop() {
-	stream.Ctx.Done()
+	stream.cancel()
 }
