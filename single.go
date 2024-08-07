@@ -31,11 +31,11 @@ func DefaultCTStream(url string) (*CTStream, error) {
 		return nil, err
 	}
 
-	return &CTStream{
-		Client: client,
-		Sleep:  DefaultSleep,
-		Ctx:    context.Background(),
-	}, nil
+	return NewCTStream(
+		client,
+		DefaultSleep,
+		context.Background(),
+	)
 }
 
 func (stream *CTStream) Init() error {
