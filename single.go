@@ -46,6 +46,8 @@ func (stream *CTStream) Init() error {
 }
 
 func (stream *CTStream) Next(callback Callback) {
+	// fmt.Printf(stream.Timeout.String())
+
 	entries, err1 := stream.Client.Next()
 
 	for _, entry := range entries {
@@ -64,8 +66,8 @@ func (stream *CTStream) Run(callback Callback) {
 		select {
 		case <-stream.Ctx.Done():
 			return
-		case <-time.After(stream.Timeout):
-			return
+		// case <-time.After(stream.Timeout):
+		// return
 		default:
 			stream.Next(callback)
 			time.Sleep(stream.Sleep)

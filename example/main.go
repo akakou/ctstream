@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	ctstream "github.com/akakou/ctstream"
 	ct "github.com/google/certificate-transparency-go"
@@ -37,17 +36,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	m.Run(func(cert *ctX509.Certificate, i ctstream.LogID, c *client.LogClient, err error) {
+	m.Start(func(cert *ctX509.Certificate, i ctstream.LogID, c *client.LogClient, err error) {
 		if err != nil {
 			fmt.Printf("Failed to fetch %v: \n", err)
 		}
 
 		fmt.Printf("%d, %s\n", i, cert.DNSNames)
 		fmt.Printf("%v%v?start=%v&end=%v\n\n", c.BaseURI(), ct.GetEntriesPath, i, i)
-	}, 1000*time.Millisecond)
+	})
 
-	// m.SetTimeout(10 * time.Second)
+	m.SetTimeout(-1)
 
-	// m.Await()
+	m.Await()
 
 }

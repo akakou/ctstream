@@ -9,9 +9,10 @@ type CTsStream struct {
 	Sleep   time.Duration
 }
 
-func NewCTsStream(streams []*CTStream) (*CTsStream, error) {
+func NewCTsStream(streams []*CTStream, sleep time.Duration) (*CTsStream, error) {
 	return &CTsStream{
 		Streams: streams,
+		Sleep:   sleep,
 	}, nil
 }
 
@@ -27,11 +28,7 @@ func DefaultCTsStream(urls []string) (*CTsStream, error) {
 		streams = append(streams, stream)
 	}
 
-	stream := CTsStream{
-		Streams: streams,
-	}
-
-	return &stream, nil
+	return NewCTsStream(streams, DefaultSleep)
 }
 
 func (stream *CTsStream) Init() error {
@@ -45,9 +42,7 @@ func (stream *CTsStream) Init() error {
 	return nil
 }
 
-func (stream *CTsStream) Start(callback Callback, sleep time.Duration) {
-	stream.Sleep = sleep
-
+func (stream *CTsStream) Start(callback Callback) {
 	for _, s := range stream.Streams {
 		go s.Run(callback)
 	}
@@ -59,8 +54,8 @@ func (stream *CTsStream) Await() {
 	}
 }
 
-func (stream *CTsStream) Run(callback Callback, sleep time.Duration) {
-	stream.Start(callback, sleep)
+func (stream *CTsStream) Run(callback Callback) {
+	stream.Start(callback)
 	stream.Await()
 }
 
