@@ -2,11 +2,11 @@ package ctstream
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"errors"
 
-	ct "github.com/google/certificate-transparency-go"
 	"github.com/google/certificate-transparency-go/client"
 	"github.com/google/certificate-transparency-go/jsonclient"
 	ctx509 "github.com/google/certificate-transparency-go/x509"
@@ -14,7 +14,8 @@ import (
 
 type LogID = int64
 
-var DefaultMaxEntries int64 = 256
+var DefaultMaxEntries int64 = 32
+var FetchingThread = 0
 
 type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
 
@@ -59,28 +60,53 @@ func (stream *CTClient) Init() error {
 	return nil
 }
 
-func (stream *CTClient) Next() ([]ct.LogEntry, error) {
+func (stream *CTClient) Next(callback Callback) error {
 	sct, err := stream.LogClient.GetSTH(stream.Context)
 	if err != nil {
-		return []ct.LogEntry{}, errors.New(ERROR_FAILED_TO_FETCH_STH)
+		return errors.New(ERROR_FAILED_TO_FETCH_STH)
 	}
 
-	if sct.TreeSize == uint64(stream.first) {
-		return []ct.LogEntry{}, errors.New(ERROR_NEW_LOGS_NOT_FOUND)
+	treeSize := int64(sct.TreeSize)
+
+	if treeSize == stream.first {
+		return errors.New(ERROR_NEW_LOGS_NOT_FOUND)
 	}
 
-	last := sct.TreeSize
-	if sct.TreeSize > uint64(stream.first+stream.maxEntrySize) {
-		last = uint64(stream.first + stream.maxEntrySize)
+	var last int64
+	var first int64
+
+	for first = stream.first; last < treeSize; first += stream.maxEntrySize {
+		last = first + stream.maxEntrySize
+
+		if treeSize < last {
+			last = treeSize
+		}
+
+		FetchingThread++
+
+		go stream.fetchEntries(first, last, callback)
 	}
 
-	logEntries, err := stream.LogClient.GetEntries(stream.Context, stream.first, LogID(last))
-	if err != nil {
-		return []ct.LogEntry{}, errors.New(ERROR_FAILED_TO_FETCH_STH)
+	stream.first = treeSize
+
+	return nil
+}
+
+func (stream *CTClient) fetchEntries(first, last int64, callback Callback) error {
+	entries, err1 := stream.LogClient.GetEntries(stream.Context, first, last)
+	if err1 != nil {
+		FetchingThread--
+		return errors.New(ERROR_FAILED_TO_FETCH_STH)
 	}
 
-	nextFirst := logEntries[len(logEntries)-1]
-	stream.first = int64(nextFirst.Index + 1)
+	for _, entry := range entries {
+		cert, err2 := extractCertFromEntry(&entry)
+		err := errors.Join(err1, err2)
 
-	return logEntries, nil
+		callback(cert, entry.Index, stream.LogClient, err)
+	}
+
+	FetchingThread--
+	fmt.Printf("Thread: %d\n", FetchingThread)
+	return nil
 }

@@ -2,12 +2,11 @@ package ctstream
 
 import (
 	"context"
-	"errors"
 	"sync"
 	"time"
 )
 
-var DefaultSleep = 1 * time.Second
+var DefaultSleep = 500 * time.Millisecond
 
 type CTStream struct {
 	Client *CTClient
@@ -46,14 +45,7 @@ func (stream *CTStream) Init() error {
 }
 
 func (stream *CTStream) Next(callback Callback) {
-	entries, err1 := stream.Client.Next()
-
-	for _, entry := range entries {
-		cert, err2 := extractCertFromEntry(&entry)
-		err := errors.Join(err1, err2)
-
-		callback(cert, entry.Index, stream.Client.LogClient, err)
-	}
+	stream.Client.Next(callback)
 }
 
 func (stream *CTStream) start(callback Callback) {
