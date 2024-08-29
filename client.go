@@ -2,7 +2,6 @@ package ctstream
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"errors"
@@ -107,6 +106,5 @@ func (stream *CTClient) fetchEntries(first, last int64, callback Callback) error
 	}
 
 	FetchingThread--
-	fmt.Printf("Thread: %d\n", FetchingThread)
 	return nil
 }
