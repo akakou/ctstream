@@ -3,6 +3,7 @@ package ctstream
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"errors"
 
@@ -15,6 +16,7 @@ type LogID = int64
 
 var DefaultMaxEntries int64 = 32
 var FetchingThread = 0
+var MaxThread = 100
 
 type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
 
@@ -27,9 +29,9 @@ type CTClient struct {
 	maxEntrySize int64
 }
 
-func NewCTClient(url string, maxEntrySize int64, ops jsonclient.Options) (*CTClient, error) {
+func NewCTClient(url string, maxEntrySize int64, ctx context.Context, ops jsonclient.Options) (*CTClient, error) {
 	hc := http.Client{}
-	ctx := context.Background()
+	_ctx := context.Context(ctx)
 
 	c, err := client.New(url, &hc, ops)
 	if err != nil {
@@ -39,14 +41,14 @@ func NewCTClient(url string, maxEntrySize int64, ops jsonclient.Options) (*CTCli
 	return &CTClient{
 		Url:          url,
 		LogClient:    c,
-		Context:      ctx,
+		Context:      _ctx,
 		maxEntrySize: maxEntrySize,
 		opts:         ops,
 	}, nil
 }
 
-func DefaultCTClient(url string) (*CTClient, error) {
-	return NewCTClient(url, DefaultMaxEntries, jsonclient.Options{})
+func DefaultCTClient(url string, ctx context.Context) (*CTClient, error) {
+	return NewCTClient(url, DefaultMaxEntries, ctx, jsonclient.Options{})
 }
 
 func (stream *CTClient) Init() error {
@@ -107,4 +109,10 @@ func (stream *CTClient) fetchEntries(first, last int64, callback Callback) error
 
 	FetchingThread--
 	return nil
+}
+
+func (ctstream *CTClient) SleepToAdjustThreadNum() {
+	for FetchingThread < MaxThread {
+		time.Sleep(DefaultSleep)
+	}
 }
