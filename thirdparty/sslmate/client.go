@@ -15,14 +15,14 @@ type SSLMateCTClient struct {
 	first  string
 }
 
-func NewSSLMateCTClient(domain string, api *api.SSLMateSearchAPI) (*SSLMateCTClient, error) {
+func NewCTClient(domain string, api *api.SSLMateSearchAPI) (*SSLMateCTClient, error) {
 	return &SSLMateCTClient{
 		Domain: domain,
 		Api:    api,
 	}, nil
 }
 
-func DefaultSSLMateCTClient(domain string) (*SSLMateCTClient, error) {
+func DefaultCTClient(domain string) (*SSLMateCTClient, error) {
 	return &SSLMateCTClient{
 		Domain: domain,
 		Api:    api.Default(),
@@ -48,7 +48,6 @@ func (client *SSLMateCTClient) next() ([]x509.Certificate, *api.Index, error) {
 }
 
 func (client *SSLMateCTClient) Init() error {
-	fmt.Print("hello")
 	return nil
 }
 
