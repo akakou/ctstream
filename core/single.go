@@ -1,24 +1,21 @@
-package stream
+package core
 
 import (
 	"context"
 	"sync"
 	"time"
-
-	"github.com/akakou/ctstream/client"
-	"github.com/akakou/ctstream/core"
 )
 
 var DefaultSleep = 1 * time.Second
 
-type CTStream[T core.CtClient] struct {
+type CTStream[T CtClient] struct {
 	Client T
 	Sleep  time.Duration
 	Ctx    context.Context
 	Wg     sync.WaitGroup
 }
 
-func NewCTStream[T core.CtClient](
+func NewCTStream[T CtClient](
 	client T,
 	sleep time.Duration,
 	Ctx context.Context,
@@ -31,28 +28,15 @@ func NewCTStream[T core.CtClient](
 	}, nil
 }
 
-func DefaultCTStream(url string) (*CTStream[*client.CTClient], error) {
-	c, err := client.DefaultCTClient(url)
-	if err != nil {
-		return nil, err
-	}
-
-	return NewCTStream[*client.CTClient](
-		c,
-		DefaultSleep,
-		context.Background(),
-	)
-}
-
 func (stream *CTStream[T]) Init() error {
 	return stream.Client.Init()
 }
 
-func (stream *CTStream[T]) Next(callback core.Callback) {
+func (stream *CTStream[T]) Next(callback Callback) {
 	stream.Client.Next(callback)
 }
 
-func (stream *CTStream[T]) Run(callback core.Callback) {
+func (stream *CTStream[T]) Run(callback Callback) {
 	stream.Wg.Add(1)
 	defer stream.Wg.Done()
 
