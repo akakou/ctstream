@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/akakou/ctstream/core"
-	api "github.com/akakou/sslmate-cert-search-api"
+	"github.com/akakou/sslmate-cert-search-api/api"
 )
 
 type SSLMateCTClient struct {

@@ -12,11 +12,10 @@ import (
 )
 
 func main() {
-	direct.DefaultSleep = time.Second
+	direct.DefaultSleep = time.Second * 10
 
 	m, err := sslmate.DefaultCTsStream([]string{
-		"example.com",
-		"google.com",
+		"test2.ochano.co",
 	})
 
 	if err != nil {

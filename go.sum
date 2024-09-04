@@ -1,5 +1,5 @@
-github.com/akakou/sslmate-cert-search-api v0.0.2 h1:Dh9vdXR5ufvtlHEGpzsrxf9/I/EtXbzEctdj+SYxfTk=
-github.com/akakou/sslmate-cert-search-api v0.0.2/go.mod h1:4nGHIrY56ATCfZOEfMUwhPqTimnPZQ9/k5aWVFjUpMk=
+github.com/akakou/sslmate-cert-search-api v0.0.4 h1:3S80OBBa6tzDZufmsRiVtTM6SSmyd1fbP4OMBBysuLw=
+github.com/akakou/sslmate-cert-search-api v0.0.4/go.mod h1:4nGHIrY56ATCfZOEfMUwhPqTimnPZQ9/k5aWVFjUpMk=
 github.com/go-logr/logr v1.4.1 h1:pKouT5E8xu9zeFC39JXRDukb6JFQPXM5p5I91188VAQ=
 github.com/go-logr/logr v1.4.1/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
 github.com/google/certificate-transparency-go v1.2.1 h1:4iW/NwzqOqYEEoCBEFP+jPbBXbLqMpq3CifMyOnDUME=
