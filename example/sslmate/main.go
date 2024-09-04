@@ -5,17 +5,16 @@ import (
 	"os"
 	"time"
 
-	"github.com/akakou/ctstream/direct"
 	"github.com/akakou/ctstream/thirdparty/sslmate"
 
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
 func main() {
-	direct.DefaultSleep = time.Second * 10
+	sslmate.DefaultSleep = time.Second * 10
 
 	m, err := sslmate.DefaultCTsStream([]string{
-		"test2.ochano.co",
+		"google.com",
 	})
 
 	if err != nil {
