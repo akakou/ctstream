@@ -7,7 +7,6 @@ import (
 	"errors"
 
 	"github.com/akakou/ctstream/core"
-
 	ct "github.com/google/certificate-transparency-go"
 	"github.com/google/certificate-transparency-go/client"
 	"github.com/google/certificate-transparency-go/jsonclient"

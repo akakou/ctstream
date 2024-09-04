@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/akakou/ctstream/client"
-	"github.com/akakou/ctstream/stream"
+	"github.com/akakou/ctstream/direct"
 	ct "github.com/google/certificate-transparency-go"
 	ctX509 "github.com/google/certificate-transparency-go/x509"
 )
 
 func main() {
-	m, err := stream.DefaultCTsStream([]string{
+	m, err := direct.DefaultCTsStream([]string{
 		"https://ct.googleapis.com/logs/us1/argon2024/",
 		"https://ct.googleapis.com/logs/eu1/xenon2024/",
 		"https://ct.cloudflare.com/logs/nimbus2024/",
