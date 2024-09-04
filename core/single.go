@@ -6,8 +6,6 @@ import (
 	"time"
 )
 
-var DefaultSleep = 1 * time.Second
-
 type CTStream[T CtClient] struct {
 	Client T
 	Sleep  time.Duration
