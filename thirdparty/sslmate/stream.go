@@ -9,12 +9,12 @@ import (
 
 var SSLMateDefaultSleep = time.Minute * 20
 
-func NewSSLMateCTStream(client *SSLMateCTClient, sleep time.Duration, ctx context.Context) (*core.CTStream[*SSLMateCTClient], error) {
+func NewCTStream(client *SSLMateCTClient, sleep time.Duration, ctx context.Context) (*core.CTStream[*SSLMateCTClient], error) {
 	return core.NewCTStream(client, sleep, ctx)
 }
 
-func DefaultSSLMateCTStream(domain string, sleep time.Duration, ctx context.Context) (*core.CTStream[*SSLMateCTClient], error) {
-	client, err := DefaultSSLMateCTClient(domain)
+func DefaultCTStream(domain string, sleep time.Duration, ctx context.Context) (*core.CTStream[*SSLMateCTClient], error) {
+	client, err := DefaultCTClient(domain)
 	if err != nil {
 		return nil, err
 	}
@@ -29,14 +29,14 @@ func DefaultSSLMateCTStream(domain string, sleep time.Duration, ctx context.Cont
 	return stream, nil
 }
 
-func NewSSLMateCTsStream(streams []*core.CTStream[*SSLMateCTClient], sleep time.Duration) (*core.CTsStream[*core.CTStream[*SSLMateCTClient]], error) {
+func NewCTsStream(streams []*core.CTStream[*SSLMateCTClient], sleep time.Duration) (*core.CTsStream[*core.CTStream[*SSLMateCTClient]], error) {
 	return core.NewCTsStream(streams, sleep)
 }
 
-func DefaultSSLMateCTsStream(domains []string) (*core.CTsStream[*core.CTStream[*SSLMateCTClient]], error) {
+func DefaultCTsStream(domains []string) (*core.CTsStream[*core.CTStream[*SSLMateCTClient]], error) {
 	streams := []*core.CTStream[*SSLMateCTClient]{}
 	for _, domain := range domains {
-		stream, err := DefaultSSLMateCTStream(domain, SSLMateDefaultSleep, context.Background())
+		stream, err := DefaultCTStream(domain, SSLMateDefaultSleep, context.Background())
 
 		if err != nil {
 			return nil, err
