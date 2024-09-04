@@ -16,7 +16,7 @@ func DefaultCTStream(url string) (*core.CTStream[*client.CTClient], error) {
 		return nil, err
 	}
 
-	return core.NewCTStream[*client.CTClient](
+	return core.NewCTStream(
 		c,
 		DefaultSleep,
 		context.Background(),
