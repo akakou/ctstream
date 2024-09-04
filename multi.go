@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-type CTsStream struct {
-	Streams []*CTStream
+type CTsStream[T any] struct {
+	Streams []*CTStream[T]
 	Sleep   time.Duration
 }
 
@@ -16,7 +16,7 @@ func NewCTsStream(streams []*CTStream, sleep time.Duration) (*CTsStream, error) 
 	}, nil
 }
 
-func DefaultCTsStream(urls []string) (*CTsStream, error) {
+func DefaultCTsStream[T any](urls []string) (*CTsStream, error) {
 	streams := []*CTStream{}
 
 	for _, url := range urls {
@@ -31,9 +31,9 @@ func DefaultCTsStream(urls []string) (*CTsStream, error) {
 	return NewCTsStream(streams, DefaultSleep)
 }
 
-func (stream *CTsStream) Init() error {
+func (stream *CTsStream[T]) Init() error {
 	for _, stream := range stream.Streams {
-		err := stream.Init()
+		err := (*stream).Init()
 		if err != nil {
 			return err
 		}
@@ -42,26 +42,26 @@ func (stream *CTsStream) Init() error {
 	return nil
 }
 
-func (stream *CTsStream) Start(callback Callback) {
+func (stream *CTsStream[T]) Start(callback Callback[T]) {
 	for _, s := range stream.Streams {
-		go s.Run(callback)
+		go (*s).Run(callback)
 	}
 }
 
-func (stream *CTsStream) Await() {
+func (stream *CTsStream[T]) Await() {
 	for _, s := range stream.Streams {
 		time.Sleep(stream.Sleep)
-		s.Await()
+		(*s).Await()
 	}
 }
 
-func (stream *CTsStream) Run(callback Callback) {
+func (stream *CTsStream) Run(callback Callback[T]) {
 	stream.Start(callback)
 	stream.Await()
 }
 
-func (stream *CTsStream) Stop() {
+func (stream *CTsStream[T]) Stop() {
 	for _, s := range stream.Streams {
-		s.Stop()
+		(*s).Stop()
 	}
 }

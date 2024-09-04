@@ -16,7 +16,17 @@ type LogID = int64
 
 var DefaultMaxEntries int64 = 256
 
-type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
+type CTClientParams struct {
+	LogId     LogID
+	LogClient *client.LogClient
+}
+
+type Callback[T any] func(*ctx509.Certificate, T, error)
+
+type CtClient interface {
+	Init() error
+	Next() error
+}
 
 type CTClient struct {
 	Url string
@@ -84,3 +94,13 @@ func (stream *CTClient) Next() ([]ct.LogEntry, error) {
 
 	return logEntries, nil
 }
+
+// func testInterface1[t any](stream CtStream[t]) {
+
+// }
+
+// func testInterface2[t any](stream CtStream[t]) {
+// 	s, _ := DefaultCTStream("")
+
+// 	testInterface1(*s)
+// }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	ctstream "github.com/akakou/ctstream"
+	"github.com/akakou/ctstream"
 	ct "github.com/google/certificate-transparency-go"
 	"github.com/google/certificate-transparency-go/client"
 	ctX509 "github.com/google/certificate-transparency-go/x509"
