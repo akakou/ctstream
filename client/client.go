@@ -1,4 +1,4 @@
-package ctstream
+package client
 
 import (
 	"context"
@@ -6,23 +6,23 @@ import (
 
 	"errors"
 
+	"github.com/akakou/ctstream/core"
+
 	ct "github.com/google/certificate-transparency-go"
 	"github.com/google/certificate-transparency-go/client"
 	"github.com/google/certificate-transparency-go/jsonclient"
-	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
-type LogID = int64
-
-var DefaultMaxEntries int64 = 256
-
-type Callback func(*ctx509.Certificate, LogID, *client.LogClient, error)
+type CTClientParams struct {
+	Index     core.LogID
+	LogClient *client.LogClient
+}
 
 type CTClient struct {
 	Url string
 	*client.LogClient
 	context.Context
-	first        LogID
+	first        core.LogID
 	opts         jsonclient.Options
 	maxEntrySize int64
 }
@@ -46,7 +46,7 @@ func NewCTClient(url string, maxEntrySize int64, ops jsonclient.Options) (*CTCli
 }
 
 func DefaultCTClient(url string) (*CTClient, error) {
-	return NewCTClient(url, DefaultMaxEntries, jsonclient.Options{})
+	return NewCTClient(url, core.DefaultMaxEntries, jsonclient.Options{})
 }
 
 func (stream *CTClient) Init() error {
@@ -59,7 +59,7 @@ func (stream *CTClient) Init() error {
 	return nil
 }
 
-func (stream *CTClient) Next() ([]ct.LogEntry, error) {
+func (stream *CTClient) next() ([]ct.LogEntry, error) {
 	sct, err := stream.LogClient.GetSTH(stream.Context)
 	if err != nil {
 		return []ct.LogEntry{}, errors.New(ERROR_FAILED_TO_FETCH_STH)
@@ -74,7 +74,7 @@ func (stream *CTClient) Next() ([]ct.LogEntry, error) {
 		last = uint64(stream.first + stream.maxEntrySize)
 	}
 
-	logEntries, err := stream.LogClient.GetEntries(stream.Context, stream.first, LogID(last))
+	logEntries, err := stream.LogClient.GetEntries(stream.Context, stream.first, core.LogID(last))
 	if err != nil {
 		return []ct.LogEntry{}, errors.New(ERROR_FAILED_TO_FETCH_STH)
 	}
@@ -83,4 +83,18 @@ func (stream *CTClient) Next() ([]ct.LogEntry, error) {
 	stream.first = int64(nextFirst.Index + 1)
 
 	return logEntries, nil
+}
+
+func (stream *CTClient) Next(callback core.Callback) {
+	logEntries, err1 := stream.next()
+
+	for _, entry := range logEntries {
+		cert, err2 := extractCertFromEntry(&entry)
+		err := errors.Join(err1, err2)
+
+		callback(cert, CTClientParams{
+			Index:     entry.Index,
+			LogClient: stream.LogClient,
+		}, err)
+	}
 }
