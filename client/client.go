@@ -44,10 +44,6 @@ func NewCTClient(url string, maxEntrySize int64, ops jsonclient.Options) (*CTCli
 	}, nil
 }
 
-func DefaultCTClient(url string) (*CTClient, error) {
-	return NewCTClient(url, core.DefaultMaxEntries, jsonclient.Options{})
-}
-
 func (stream *CTClient) Init() error {
 	sct, err := stream.GetSTH(stream.Context)
 	if err != nil {

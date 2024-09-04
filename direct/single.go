@@ -6,12 +6,17 @@ import (
 
 	"github.com/akakou/ctstream/client"
 	"github.com/akakou/ctstream/core"
+	"github.com/google/certificate-transparency-go/jsonclient"
 )
 
 var DefaultSleep = 1 * time.Second
 
+func DefaultCTClient(url string) (*client.CTClient, error) {
+	return client.NewCTClient(url, core.DefaultMaxEntries, jsonclient.Options{})
+}
+
 func DefaultCTStream(url string) (*core.CTStream[*client.CTClient], error) {
-	c, err := client.DefaultCTClient(url)
+	c, err := DefaultCTClient(url)
 	if err != nil {
 		return nil, err
 	}
