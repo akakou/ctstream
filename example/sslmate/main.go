@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	sslmate.DefaultSleep = time.Second * 10
+	sslmate.DefaultEpochSleep = time.Second * 10
 
 	m, err := sslmate.DefaultCTsStream([]string{
 		"google.com",

@@ -4,6 +4,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/akakou/ctstream/core"
 	"github.com/akakou/sslmate-cert-search-api/api"
@@ -13,13 +14,15 @@ type SSLMateCTClient struct {
 	Api    *api.SSLMateSearchAPI
 	Domain string
 	First  string
+	Sleep  time.Duration
 }
 
-func NewCTClient(domain string, api *api.SSLMateSearchAPI, first string) (*SSLMateCTClient, error) {
+func NewCTClient(domain string, api *api.SSLMateSearchAPI, sleep time.Duration) (*SSLMateCTClient, error) {
 	return &SSLMateCTClient{
 		Domain: domain,
 		Api:    api,
-		First:  first,
+		First:  "",
+		Sleep:  sleep,
 	}, nil
 }
 
@@ -27,6 +30,7 @@ func DefaultCTClient(domain string) (*SSLMateCTClient, error) {
 	return &SSLMateCTClient{
 		Domain: domain,
 		Api:    api.Default(),
+		Sleep:  DefaultPullingSleep,
 	}, nil
 }
 
@@ -49,16 +53,20 @@ func (client *SSLMateCTClient) next() ([]x509.Certificate, *api.Index, error) {
 }
 
 func (client *SSLMateCTClient) Init() error {
-	_, _, err := client.next()
-	return err
+	return nil
 }
 
 func (client *SSLMateCTClient) Next(callback core.Callback) {
-	certs, index, err1 := client.next()
+	l := 1
 
-	for _, cert := range certs {
-		cert, err2 := reformatCertificate(&cert)
+	for l != 0 {
+		certs, _, err1 := client.next()
+		formated, err2 := reformatCertificates(certs)
+
 		err := errors.Join(err1, err2)
-		callback(cert, index, err)
+		callbacks(formated, callback, err)
+
+		time.Sleep(DefaultPullingSleep)
+		l = len(certs)
 	}
 }
