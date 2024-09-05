@@ -1,4 +1,4 @@
-package ctstream
+package client
 
 import (
 	"errors"

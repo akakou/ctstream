@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"os"
 
-	ctstream "github.com/akakou/ctstream"
+	"github.com/akakou/ctstream/client"
+	"github.com/akakou/ctstream/direct"
 	ct "github.com/google/certificate-transparency-go"
-	"github.com/google/certificate-transparency-go/client"
 	ctX509 "github.com/google/certificate-transparency-go/x509"
 )
 
 func main() {
-	m, err := ctstream.DefaultCTsStream([]string{
+	m, err := direct.DefaultCTsStream([]string{
 		"https://ct.googleapis.com/logs/us1/argon2024/",
 		"https://ct.googleapis.com/logs/eu1/xenon2024/",
 		"https://ct.cloudflare.com/logs/nimbus2024/",
@@ -36,15 +36,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	m.Start(func(cert *ctX509.Certificate, i ctstream.LogID, c *client.LogClient, err error) {
+	m.Start(func(cert *ctX509.Certificate, option any, err error) {
+		params := option.(client.CTClientParams)
+
 		if err != nil {
 			fmt.Printf("Failed to fetch %v: \n", err)
 		}
 
-		fmt.Printf("%d, %s\n", i, cert.DNSNames)
-		fmt.Printf("%v%v?start=%v&end=%v\n\n", c.BaseURI(), ct.GetEntriesPath, i, i)
+		fmt.Printf("%d, %s\n", params.Index, cert.DNSNames)
+		fmt.Printf("%v%v?start=%v&end=%v\n\n", params.LogClient.BaseURI(), ct.GetEntriesPath, params.Index, params.Index)
 	})
 
 	m.Await()
-
 }
