@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/akakou/ctstream/client"
 	"github.com/akakou/ctstream/direct"
 	ct "github.com/google/certificate-transparency-go"
 	ctX509 "github.com/google/certificate-transparency-go/x509"
@@ -37,7 +36,7 @@ func main() {
 	}
 
 	m.Start(func(cert *ctX509.Certificate, option any, err error) {
-		params := option.(client.CTClientParams)
+		params := option.(direct.CTClientParams)
 
 		if err != nil {
 			fmt.Printf("Failed to fetch %v: \n", err)

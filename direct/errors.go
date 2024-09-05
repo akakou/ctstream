@@ -1,4 +1,4 @@
-package client
+package direct
 
 const (
 	ERROR_FAILED_TO_NEW       = "failed to create new client"
