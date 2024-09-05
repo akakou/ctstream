@@ -12,13 +12,14 @@ import (
 type SSLMateCTClient struct {
 	Api    *api.SSLMateSearchAPI
 	Domain string
-	first  string
+	First  string
 }
 
-func NewCTClient(domain string, api *api.SSLMateSearchAPI) (*SSLMateCTClient, error) {
+func NewCTClient(domain string, api *api.SSLMateSearchAPI, first string) (*SSLMateCTClient, error) {
 	return &SSLMateCTClient{
 		Domain: domain,
 		Api:    api,
+		First:  first,
 	}, nil
 }
 
@@ -34,7 +35,7 @@ func (client *SSLMateCTClient) next() ([]x509.Certificate, *api.Index, error) {
 		Domain:            client.Domain,
 		IncludeSubdomains: true,
 		MatchWildcards:    true,
-		After:             client.first,
+		After:             client.First,
 		Expand:            "",
 	}
 
@@ -43,12 +44,13 @@ func (client *SSLMateCTClient) next() ([]x509.Certificate, *api.Index, error) {
 		return nil, nil, fmt.Errorf("%v: %v", ErrrorFailedToSearch, err)
 	}
 
-	client.first = last.Last
+	client.First = last.Last
 	return certs, nil, nil
 }
 
 func (client *SSLMateCTClient) Init() error {
-	return nil
+	_, _, err := client.next()
+	return err
 }
 
 func (client *SSLMateCTClient) Next(callback core.Callback) {
