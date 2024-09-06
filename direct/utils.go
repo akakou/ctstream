@@ -1,4 +1,4 @@
-package ctstream
+package direct
 
 import (
 	"errors"
@@ -25,4 +25,18 @@ func extractCertFromEntry(entry *ct.LogEntry) (*ctx509.Certificate, error) {
 	}
 
 	return ctCert, err
+}
+
+func extractCertFromEntries(entries []ct.LogEntry) ([]*ctx509.Certificate, error) {
+	extracted := []*ctx509.Certificate{}
+	var err error
+
+	for _, e := range entries {
+		ctCert, tmpErr := extractCertFromEntry(&e)
+		extracted = append(extracted, ctCert)
+
+		err = errors.Join(err, tmpErr)
+	}
+
+	return extracted, err
 }
