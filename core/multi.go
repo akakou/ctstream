@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -48,7 +47,6 @@ func (stream *CTsStream[T]) Run(callback Callback) {
 
 func (stream *CTsStream[T]) Stop() {
 	for _, s := range stream.Streams {
-		fmt.Printf("1\n")
 		s.Stop()
 	}
 }
