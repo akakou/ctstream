@@ -5,17 +5,12 @@ import (
 	"time"
 
 	"github.com/akakou/ctstream/core"
-	"github.com/google/certificate-transparency-go/jsonclient"
 )
 
 var DefaultSleep = 1 * time.Second
 
-func DefaultCTClient(url string) (*CTClient, error) {
-	return NewCTClient(url, core.DefaultMaxEntries, jsonclient.Options{})
-}
-
-func DefaultCTStream(url string) (*core.CTStream[*CTClient], error) {
-	c, err := DefaultCTClient(url)
+func DefaultCTStream(url string, ctx context.Context) (*core.CTStream[*CTClient], error) {
+	c, err := DefaultCTClient(url, ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -23,15 +18,15 @@ func DefaultCTStream(url string) (*core.CTStream[*CTClient], error) {
 	return core.NewCTStream(
 		c,
 		DefaultSleep,
-		context.Background(),
+		ctx,
 	)
 }
 
-func DefaultCTsStream(urls []string) (*core.CTsStream[*core.CTStream[*CTClient]], error) {
+func DefaultCTsStream(urls []string, ctx context.Context) (*core.CTsStream[*core.CTStream[*CTClient]], error) {
 	streams := []*core.CTStream[*CTClient]{}
 
 	for _, url := range urls {
-		stream, err := DefaultCTStream(url)
+		stream, err := DefaultCTStream(url, ctx)
 		if err != nil {
 			return nil, err
 		}

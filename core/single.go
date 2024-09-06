@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 )
@@ -54,5 +55,6 @@ func (stream *CTStream[T]) Await() {
 }
 
 func (stream *CTStream[T]) Stop() {
+	fmt.Printf("2\n")
 	stream.Ctx.Done()
 }

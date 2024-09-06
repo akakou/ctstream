@@ -4,7 +4,6 @@ import (
 	"crypto/x509"
 	"errors"
 
-	"github.com/akakou/ctstream/core"
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
@@ -23,10 +22,4 @@ func reformatCertificates(certs []x509.Certificate) ([]*ctx509.Certificate, erro
 	}
 
 	return result, err
-}
-
-func callbacks(certs []*ctx509.Certificate, callback core.Callback, err error) {
-	for index, c := range certs {
-		callback(c, index, err)
-	}
 }

@@ -7,9 +7,10 @@ import (
 	"errors"
 
 	"github.com/akakou/ctstream/core"
-	ct "github.com/google/certificate-transparency-go"
+	"github.com/akakou/ctstream/utils"
 	"github.com/google/certificate-transparency-go/client"
 	"github.com/google/certificate-transparency-go/jsonclient"
+	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
 type CTClientParams struct {
@@ -26,9 +27,9 @@ type CTClient struct {
 	maxEntrySize int64
 }
 
-func NewCTClient(url string, maxEntrySize int64, ops jsonclient.Options) (*CTClient, error) {
+func NewCTClient(url string, maxEntrySize int64, ctx context.Context, ops jsonclient.Options) (*CTClient, error) {
 	hc := http.Client{}
-	ctx := context.Background()
+	_ctx := context.Context(ctx)
 
 	c, err := client.New(url, &hc, ops)
 	if err != nil {
@@ -38,10 +39,14 @@ func NewCTClient(url string, maxEntrySize int64, ops jsonclient.Options) (*CTCli
 	return &CTClient{
 		Url:          url,
 		LogClient:    c,
-		Context:      ctx,
+		Context:      _ctx,
 		maxEntrySize: maxEntrySize,
 		opts:         ops,
 	}, nil
+}
+
+func DefaultCTClient(url string, ctx context.Context) (*CTClient, error) {
+	return NewCTClient(url, core.DefaultMaxEntries, ctx, jsonclient.Options{})
 }
 
 func (stream *CTClient) Init() error {
@@ -54,42 +59,61 @@ func (stream *CTClient) Init() error {
 	return nil
 }
 
-func (stream *CTClient) next() ([]ct.LogEntry, error) {
+func (stream *CTClient) Next(callback core.Callback) {
 	sct, err := stream.LogClient.GetSTH(stream.Context)
 	if err != nil {
-		return []ct.LogEntry{}, errors.New(ERROR_FAILED_TO_FETCH_STH)
+		err = errors.New(ERROR_FAILED_TO_FETCH_STH)
+		callback(
+			&ctx509.Certificate{},
+			&CTClientParams{
+				LogClient: stream.LogClient,
+				Index:     0,
+			},
+			err,
+		)
+		return
 	}
 
-	if sct.TreeSize == uint64(stream.first) {
-		return []ct.LogEntry{}, errors.New(ERROR_NEW_LOGS_NOT_FOUND)
+	treeSize := int64(sct.TreeSize)
+
+	if treeSize == stream.first {
+		err = errors.New(ERROR_NEW_LOGS_NOT_FOUND)
+		callback(
+			&ctx509.Certificate{},
+			&CTClientParams{
+				LogClient: stream.LogClient,
+				Index:     0,
+			},
+			err,
+		)
+		return
 	}
 
-	last := sct.TreeSize
-	if sct.TreeSize > uint64(stream.first+stream.maxEntrySize) {
-		last = uint64(stream.first + stream.maxEntrySize)
+	var start int64
+	var end int64
+
+	for start = stream.first; end < treeSize; start += stream.maxEntrySize {
+		end = start + stream.maxEntrySize
+
+		if treeSize < end {
+			end = treeSize
+		}
+
+		ThreadManager.Run(
+			func(args Args) {
+				start := args[0].(int64)
+				end := args[1].(int64)
+
+				entries, err := stream.LogClient.GetEntries(stream.Context, start, end)
+				certs, err2 := extractCertFromEntries(entries)
+
+				utils.Callbacks(certs, &CTClientParams{
+					LogClient: stream.LogClient,
+					Index:     start,
+				}, callback, errors.Join(err, err2))
+			}, Args{start, end},
+		)
 	}
 
-	logEntries, err := stream.LogClient.GetEntries(stream.Context, stream.first, core.LogID(last))
-	if err != nil {
-		return []ct.LogEntry{}, errors.New(ERROR_FAILED_TO_FETCH_STH)
-	}
-
-	nextFirst := logEntries[len(logEntries)-1]
-	stream.first = int64(nextFirst.Index + 1)
-
-	return logEntries, nil
-}
-
-func (stream *CTClient) Next(callback core.Callback) {
-	logEntries, err1 := stream.next()
-
-	for _, entry := range logEntries {
-		cert, err2 := extractCertFromEntry(&entry)
-		err := errors.Join(err1, err2)
-
-		callback(cert, CTClientParams{
-			Index:     entry.Index,
-			LogClient: stream.LogClient,
-		}, err)
-	}
+	stream.first = treeSize
 }

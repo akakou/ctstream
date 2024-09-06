@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/akakou/ctstream/core"
+	"github.com/akakou/ctstream/utils"
 	"github.com/akakou/sslmate-cert-search-api/api"
 )
 
@@ -64,7 +65,7 @@ func (client *SSLMateCTClient) Next(callback core.Callback) {
 		formated, err2 := reformatCertificates(certs)
 
 		err := errors.Join(err1, err2)
-		callbacks(formated, callback, err)
+		utils.Callbacks(formated, nil, callback, err)
 
 		time.Sleep(DefaultPullingSleep)
 		l = len(certs)
