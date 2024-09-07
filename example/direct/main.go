@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/akakou/ctstream/direct"
 	ctX509 "github.com/google/certificate-transparency-go/x509"
@@ -36,20 +35,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	m.Start(func(cert *ctX509.Certificate, option any, err error) {
+	m.Start(func(cert *ctX509.Certificate, i int, option any, err error) {
 		params := option.(*direct.CTClientParams)
 
 		if err != nil {
 			fmt.Printf("Failed to fetch %v: \n", err)
 		}
 
-		fmt.Printf("cert data: %v, %s %v\n", cert.DNSNames, params.LogClient.BaseURI(), err)
+		// fmt.Printf("%v, %v, %s %v\n", cert.DNSNames, params.Start, params.LogClient.BaseURI(), err)
+		fmt.Printf("%v\n", params.Start+int64(i))
 	})
 
-	go func() {
-		time.Sleep(10 * time.Second)
-		m.Stop()
-	}()
+	// go func() {
+	// 	time.Sleep(10 * time.Second)
+	// 	m.Stop()
+	// }()
 
 	m.Await()
 }

@@ -3,7 +3,9 @@ package direct
 import (
 	"errors"
 
+	"github.com/akakou/ctstream/core"
 	ct "github.com/google/certificate-transparency-go"
+	"github.com/google/certificate-transparency-go/client"
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
@@ -39,4 +41,16 @@ func extractCertFromEntries(entries []ct.LogEntry) ([]*ctx509.Certificate, error
 	}
 
 	return extracted, err
+}
+
+func callFailed(err error, logCleint *client.LogClient, callback core.Callback) {
+	callback(
+		&ctx509.Certificate{},
+		0,
+		&CTClientParams{
+			LogClient: logCleint,
+			Start:     0,
+		},
+		err,
+	)
 }

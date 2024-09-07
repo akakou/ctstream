@@ -6,7 +6,7 @@ import (
 )
 
 func Callbacks(certs []*ctx509.Certificate, params any, callback core.Callback, err error) {
-	for _, c := range certs {
-		callback(c, params, err)
+	for i, c := range certs {
+		callback(c, i, params, err)
 	}
 }
