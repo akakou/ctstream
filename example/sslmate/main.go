@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -15,7 +16,7 @@ func main() {
 
 	m, err := sslmate.DefaultCTsStream([]string{
 		"google.com",
-	})
+	}, context.Background())
 
 	if err != nil {
 		fmt.Printf("Failed to create new ctstream: ")

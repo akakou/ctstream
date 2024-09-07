@@ -34,10 +34,10 @@ func NewCTsStream(streams []*core.CTStream[*SSLMateCTClient], sleep time.Duratio
 	return core.NewCTsStream(streams, sleep)
 }
 
-func DefaultCTsStream(domains []string) (*core.CTsStream[*core.CTStream[*SSLMateCTClient]], error) {
+func DefaultCTsStream(domains []string, ctx context.Context) (*core.CTsStream[*core.CTStream[*SSLMateCTClient]], error) {
 	streams := []*core.CTStream[*SSLMateCTClient]{}
 	for _, domain := range domains {
-		stream, err := DefaultCTStream(domain, DefaultEpochSleep, context.Background())
+		stream, err := DefaultCTStream(domain, DefaultEpochSleep, ctx)
 
 		if err != nil {
 			return nil, err
