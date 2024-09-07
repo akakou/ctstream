@@ -10,11 +10,10 @@ import (
 	"github.com/akakou/ctstream/utils"
 	"github.com/google/certificate-transparency-go/client"
 	"github.com/google/certificate-transparency-go/jsonclient"
-	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
 type CTClientParams struct {
-	Index     core.LogID
+	Start     core.LogID
 	LogClient *client.LogClient
 }
 
@@ -63,14 +62,7 @@ func (stream *CTClient) Next(callback core.Callback) {
 	sct, err := stream.LogClient.GetSTH(stream.Context)
 	if err != nil {
 		err = errors.New(ERROR_FAILED_TO_FETCH_STH)
-		callback(
-			&ctx509.Certificate{},
-			&CTClientParams{
-				LogClient: stream.LogClient,
-				Index:     0,
-			},
-			err,
-		)
+		callFailed(err, stream.LogClient, callback)
 		return
 	}
 
@@ -78,14 +70,7 @@ func (stream *CTClient) Next(callback core.Callback) {
 
 	if treeSize == stream.first {
 		err = errors.New(ERROR_NEW_LOGS_NOT_FOUND)
-		callback(
-			&ctx509.Certificate{},
-			&CTClientParams{
-				LogClient: stream.LogClient,
-				Index:     0,
-			},
-			err,
-		)
+		callFailed(err, stream.LogClient, callback)
 		return
 	}
 
@@ -109,7 +94,7 @@ func (stream *CTClient) Next(callback core.Callback) {
 
 				utils.Callbacks(certs, &CTClientParams{
 					LogClient: stream.LogClient,
-					Index:     start,
+					Start:     start,
 				}, callback, errors.Join(err, err2))
 			}, Args{start, end},
 		)
