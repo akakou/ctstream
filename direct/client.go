@@ -69,8 +69,6 @@ func (stream *CTClient) Next(callback core.Callback) {
 	treeSize := int64(sct.TreeSize)
 
 	if treeSize == stream.first {
-		err = errors.New(ERROR_NEW_LOGS_NOT_FOUND)
-		callFailed(err, stream.LogClient, callback)
 		return
 	}
 
