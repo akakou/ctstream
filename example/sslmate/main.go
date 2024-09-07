@@ -28,7 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	m.Start(func(cert *ctx509.Certificate, option any, err error) {
+	m.Start(func(cert *ctx509.Certificate, i int, option any, err error) {
 		if err != nil {
 			fmt.Printf("Failed to fetch %v: \n", err)
 		}

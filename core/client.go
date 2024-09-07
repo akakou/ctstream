@@ -8,7 +8,7 @@ type LogID = int64
 
 var DefaultMaxEntries int64 = 256
 
-type Callback func(*ctx509.Certificate, any, error)
+type Callback func(*ctx509.Certificate, int, any, error)
 
 type CtClient interface {
 	Init() error
