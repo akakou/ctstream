@@ -34,9 +34,9 @@ func main() {
 			fmt.Printf("Failed to fetch %v: \n", err)
 		}
 
-		params := opt.(sslmate.SSLMateCTParams)
+		params := opt.(*sslmate.SSLMateCTParams)
 
-		fmt.Printf("%v ~ %v: %v\n", params.First, params.Last, cert.DNSNames)
+		fmt.Printf("%v ~ %v: %v (target: %v)\n", params.Index.First, params.Index.First, cert.DNSNames, params.Client.Domain)
 	})
 
 	m.Await()
