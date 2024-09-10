@@ -3,9 +3,7 @@ package sslmate
 import (
 	"crypto/x509"
 	"errors"
-	"strconv"
 
-	"github.com/akakou/ctstream/core"
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
@@ -24,18 +22,4 @@ func reformatCertificates(certs []x509.Certificate) ([]*ctx509.Certificate, erro
 	}
 
 	return result, err
-}
-
-func Last(CTsStream *core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]]) int {
-	var last int
-
-	for _, stream := range CTsStream.Streams {
-		tmp, _ := strconv.Atoi(stream.Client.First)
-
-		if tmp > last {
-			last = tmp
-		}
-	}
-
-	return last
 }

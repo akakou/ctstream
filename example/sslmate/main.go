@@ -46,5 +46,5 @@ func main() {
 
 	m.Await()
 
-	fmt.Printf("last: %v: ", sslmate.Last(m))
+	fmt.Printf("last: %v: ", sslmate.GetFirst(m))
 }
