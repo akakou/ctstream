@@ -18,6 +18,8 @@ type SSLMateCTClient struct {
 	Sleep  time.Duration
 }
 
+type SSLMateCTParams *api.Index
+
 func NewCTClient(domain string, api *api.SSLMateSearchAPI, sleep time.Duration) (*SSLMateCTClient, error) {
 	return &SSLMateCTClient{
 		Domain: domain,
@@ -35,7 +37,7 @@ func DefaultCTClient(domain string) (*SSLMateCTClient, error) {
 	}, nil
 }
 
-func (client *SSLMateCTClient) next() ([]x509.Certificate, *api.Index, error) {
+func (client *SSLMateCTClient) next() ([]x509.Certificate, SSLMateCTParams, error) {
 	query := api.Query{
 		Domain:            client.Domain,
 		IncludeSubdomains: true,
@@ -50,7 +52,7 @@ func (client *SSLMateCTClient) next() ([]x509.Certificate, *api.Index, error) {
 	}
 
 	client.First = last.Last
-	return certs, nil, nil
+	return certs, last, nil
 }
 
 func (client *SSLMateCTClient) Init() error {
@@ -61,11 +63,11 @@ func (client *SSLMateCTClient) Next(callback core.Callback) {
 	l := 1
 
 	for l != 0 {
-		certs, _, err1 := client.next()
+		certs, index, err1 := client.next()
 		formated, err2 := reformatCertificates(certs)
 
 		err := errors.Join(err1, err2)
-		utils.Callbacks(formated, nil, callback, err)
+		utils.Callbacks(formated, index, callback, err)
 
 		time.Sleep(DefaultPullingSleep)
 		l = len(certs)
