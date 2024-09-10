@@ -28,6 +28,10 @@ func (stream *ConcurrentCTsStream[T]) Init() error {
 }
 
 func (stream *ConcurrentCTsStream[T]) Start(callback Callback) {
+	go stream.start(callback)
+}
+
+func (stream *ConcurrentCTsStream[T]) start(callback Callback) {
 	for {
 		stream.Next(callback)
 	}
