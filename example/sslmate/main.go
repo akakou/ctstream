@@ -36,8 +36,15 @@ func main() {
 
 		params := opt.(*sslmate.SSLMateCTParams)
 
-		fmt.Printf("%v ~ %v: %v (target: %v)\n", params.Index.First, params.Index.First, cert.DNSNames, params.Client.Domain)
+		fmt.Printf("%v ~ %v: %v (target: %v)\n", params.Index.First, params.Index.Last, cert.DNSNames, params.Client.Domain)
 	})
 
+	go func() {
+		time.Sleep(40 * time.Second)
+		m.Stop()
+	}()
+
 	m.Await()
+
+	fmt.Printf("last: %v: ", sslmate.Last(m))
 }
