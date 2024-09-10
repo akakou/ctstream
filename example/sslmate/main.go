@@ -29,12 +29,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	m.Start(func(cert *ctx509.Certificate, i int, option any, err error) {
+	m.Start(func(cert *ctx509.Certificate, i int, opt any, err error) {
 		if err != nil {
 			fmt.Printf("Failed to fetch %v: \n", err)
 		}
 
-		fmt.Printf("%v\n", cert.DNSNames)
+		params := opt.(sslmate.SSLMateCTParams)
+
+		fmt.Printf("%v ~ %v: %v\n", params.First, params.Last, cert.DNSNames)
 	})
 
 	m.Await()
