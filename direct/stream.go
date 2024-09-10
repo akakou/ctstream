@@ -22,7 +22,7 @@ func DefaultCTStream(url string, ctx context.Context) (*core.CTStream[*CTClient]
 	)
 }
 
-func DefaultCTsStream(urls []string, ctx context.Context) (*core.AsyncCTsStream[*core.CTStream[*CTClient]], error) {
+func DefaultCTsStream(urls []string, ctx context.Context) (*core.PararellCTsStream[*core.CTStream[*CTClient]], error) {
 	streams := []*core.CTStream[*CTClient]{}
 
 	for _, url := range urls {
@@ -34,5 +34,5 @@ func DefaultCTsStream(urls []string, ctx context.Context) (*core.AsyncCTsStream[
 		streams = append(streams, stream)
 	}
 
-	return core.NewAsyncCTsStream(streams, DefaultSleep)
+	return core.NewPararellCTsStream(streams, DefaultSleep)
 }

@@ -30,11 +30,11 @@ func DefaultCTStream(domain string, context context.Context) (*core.CTStream[*SS
 	return stream, nil
 }
 
-func NewCTsStream(streams []*core.CTStream[*SSLMateCTClient], sleep time.Duration) (*core.SyncCTsStream[*core.CTStream[*SSLMateCTClient]], error) {
-	return core.NewSyncCTsStream(streams, sleep)
+func NewCTsStream(streams []*core.CTStream[*SSLMateCTClient], sleep time.Duration) (*core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]], error) {
+	return core.NewConcurrentCTsStream(streams, sleep)
 }
 
-func DefaultCTsStream(domains []string, context context.Context) (*core.SyncCTsStream[*core.CTStream[*SSLMateCTClient]], error) {
+func DefaultCTsStream(domains []string, context context.Context) (*core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]], error) {
 	var streams []*core.CTStream[*SSLMateCTClient]
 
 	for _, domain := range domains {
@@ -46,7 +46,7 @@ func DefaultCTsStream(domains []string, context context.Context) (*core.SyncCTsS
 		streams = append(streams, stream)
 	}
 
-	res, err := core.NewSyncCTsStream(streams, DefaultEpochSleep)
+	res, err := core.NewConcurrentCTsStream(streams, DefaultEpochSleep)
 
 	return res, err
 }

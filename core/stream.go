@@ -8,3 +8,5 @@ type CtStream interface {
 	Stop()
 	Await()
 }
+
+type CTsStream[T CtStream] PararellCTsStream[T]
