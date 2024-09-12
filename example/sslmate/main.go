@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/akakou/ctstream/core"
-	"github.com/akakou/ctstream/thirdparty/sslmate"
+	"github.com/akakou/ctstream/monitor/sslmate"
 
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
