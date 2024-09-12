@@ -7,15 +7,15 @@ import (
 
 const ERROR_NOT_FOUND = "not found"
 
-type DefaultCTStream[T CtClient] func(string, context.Context) (*CTStream[T], error)
+type DefaultCTStream[C CtClient] func(string, context.Context) (C, error)
 
 func SelectByDomain[C CtClient](
 	domain string,
-	streams *ConcurrentCTsStream[*CTStream[C]],
-) (*CTStream[C], int, error) {
-	for i, stream := range streams.Streams {
-		if stream.Client.GetDomain() == domain {
-			return stream, i, nil
+	clients *CTClients[C],
+) (*C, int, error) {
+	for i, c := range clients.Clients {
+		if c.GetDomain() == domain {
+			return &c, i, nil
 		}
 	}
 
@@ -26,30 +26,30 @@ func AddByDomain[C CtClient](
 	domain string,
 	ctx context.Context,
 	def DefaultCTStream[C],
-	streams *ConcurrentCTsStream[*CTStream[C]],
-) (*CTStream[C], int, error) {
-	stream, err := def(domain, ctx)
+	clients *CTClients[C],
+) (*C, int, error) {
+	client, err := def(domain, ctx)
 
 	if err != nil {
 		return nil, 0, err
 	}
 
-	streams.Streams = append(streams.Streams, stream)
+	clients.Clients = append(clients.Clients, client)
 
-	return stream, len(streams.Streams) - 1, nil
+	return &client, len(clients.Clients) - 1, nil
 }
 
 func DelByDomain[C CtClient](
 	domain string,
 	ctx context.Context,
-	streams *ConcurrentCTsStream[*CTStream[C]],
-) (*CTStream[C], int, error) {
-	stream, i, err := SelectByDomain(domain, streams)
+	clients *CTClients[C],
+) (*C, int, error) {
+	client, i, err := SelectByDomain(domain, clients)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	streams.Streams = append(streams.Streams[:i], streams.Streams[i+1:]...)
+	clients.Clients = append(clients.Clients[:i], clients.Clients[i+1:]...)
 
-	return stream, i, nil
+	return client, i, nil
 }
