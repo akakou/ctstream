@@ -4,15 +4,22 @@ import (
 	"context"
 
 	"github.com/akakou/ctstream/core"
-	"github.com/akakou/ctstream/monitor"
 )
+
+func SelectByDomain(
+	domain string,
+	ctx context.Context,
+	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
+) (*core.CTStream[*CrtshCTClient], int, error) {
+	return core.SelectByDomain(domain, streams)
+}
 
 func AddByDomain(
 	domain string,
 	ctx context.Context,
 	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
 ) error {
-	return monitor.AddByDomain(domain, ctx, DefaultCTStream, streams)
+	return core.AddByDomain(domain, ctx, DefaultCTStream, streams)
 }
 
 func DelByDomain(
@@ -20,5 +27,5 @@ func DelByDomain(
 	ctx context.Context,
 	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
 ) error {
-	return monitor.DelByDomain(domain, ctx, streams)
+	return core.DelByDomain(domain, ctx, streams)
 }
