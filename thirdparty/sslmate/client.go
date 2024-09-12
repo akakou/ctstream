@@ -36,7 +36,7 @@ func DefaultCTClient(domain string) (*SSLMateCTClient, error) {
 	return &SSLMateCTClient{
 		Domain: domain,
 		Api:    api.Default(),
-		Sleep:  DefaultPullingSleep,
+		Sleep:  core.DefaultPullingSleep,
 	}, nil
 }
 
@@ -67,7 +67,7 @@ func (client *SSLMateCTClient) Next(callback core.Callback) {
 
 	for l != 0 {
 		certs, index, err1 := client.next()
-		formated, err2 := reformatCertificates(certs)
+		formated, err2 := utils.ReformatCertificates(certs)
 
 		err := errors.Join(err1, err2)
 		utils.Callbacks(formated, &SSLMateCTParams{
@@ -75,7 +75,7 @@ func (client *SSLMateCTClient) Next(callback core.Callback) {
 			Client: client,
 		}, callback, err)
 
-		time.Sleep(DefaultPullingSleep)
+		time.Sleep(core.DefaultPullingSleep)
 		l = len(certs)
 	}
 }

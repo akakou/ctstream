@@ -6,13 +6,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/akakou/ctstream/core"
 	"github.com/akakou/ctstream/thirdparty/sslmate"
 
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
 func main() {
-	sslmate.DefaultEpochSleep = time.Second * 10
+	core.DefaultEpochSleep = time.Second * 10
 
 	m, err := sslmate.DefaultCTsStream([]string{
 		"google.com",
