@@ -18,4 +18,5 @@ type Callback func(*ctx509.Certificate, int, any, error)
 type CtClient interface {
 	Init() error
 	Next(callback Callback)
+	GetDomain() string
 }
