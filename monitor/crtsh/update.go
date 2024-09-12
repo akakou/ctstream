@@ -8,7 +8,6 @@ import (
 
 func SelectByDomain(
 	domain string,
-	ctx context.Context,
 	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
 ) (*core.CTStream[*CrtshCTClient], int, error) {
 	return core.SelectByDomain(domain, streams)
