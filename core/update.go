@@ -27,29 +27,29 @@ func AddByDomain[C CtClient](
 	ctx context.Context,
 	def DefaultCTStream[C],
 	streams *ConcurrentCTsStream[*CTStream[C]],
-) error {
+) (*CTStream[C], int, error) {
 	stream, err := def(domain, ctx)
 
 	if err != nil {
-		return err
+		return nil, 0, err
 	}
 
 	streams.Streams = append(streams.Streams, stream)
 
-	return nil
+	return stream, len(streams.Streams) - 1, nil
 }
 
 func DelByDomain[C CtClient](
 	domain string,
 	ctx context.Context,
 	streams *ConcurrentCTsStream[*CTStream[C]],
-) error {
-	_, i, err := SelectByDomain(domain, streams)
+) (*CTStream[C], int, error) {
+	stream, i, err := SelectByDomain(domain, streams)
 	if err != nil {
-		return err
+		return nil, 0, err
 	}
 
 	streams.Streams = append(streams.Streams[:i], streams.Streams[i+1:]...)
 
-	return nil
+	return stream, i, nil
 }
