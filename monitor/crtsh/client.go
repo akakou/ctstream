@@ -7,18 +7,18 @@ import (
 )
 
 type CrtshCTClient struct {
-	Index  int
+	ID     int
 	Domain string
 }
 
 type CrtshCTParams struct {
-	Index  int
+	ID     int
 	Client *CrtshCTClient
 }
 
 func NewCTClient(domain string) (*CrtshCTClient, error) {
 	return &CrtshCTClient{
-		Index:  0,
+		ID:     0,
 		Domain: domain,
 	}, nil
 }
@@ -36,11 +36,16 @@ func (client *CrtshCTClient) Next(callback core.Callback) {
 	}
 
 	for i, entry := range entries {
+		if entry.ID <= client.ID {
+			continue
+		}
+
 		c, err := utils.ReformatCertificate(entry.Certificate)
 		callback(c, i, &CrtshCTParams{
-			Index:  i,
+			ID:     entries[i].ID,
 			Client: client,
 		}, err)
+
 	}
 }
 

@@ -1,30 +1,31 @@
 package crtsh
 
 import (
-	"context"
-
 	"github.com/akakou/ctstream/core"
 )
 
+func null() *CrtshCTClient { return nil }
+
 func SelectByDomain(
 	domain string,
-	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
-) (*core.CTStream[*CrtshCTClient], int, error) {
-	return core.SelectByDomain(domain, streams)
+	clients *core.CTClients[*CrtshCTClient],
+) (*CrtshCTClient, int, error) {
+	client, i, err := core.SelectByDomain(domain, clients, null)
+	return client, i, err
 }
 
 func AddByDomain(
 	domain string,
-	ctx context.Context,
-	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
-) (*core.CTStream[*CrtshCTClient], int, error) {
-	return core.AddByDomain(domain, ctx, DefaultCTStream, streams)
+	clients *core.CTClients[*CrtshCTClient],
+) (*CrtshCTClient, int, error) {
+	client, i, err := core.AddByDomain(domain, NewCTClient, clients, null)
+	return client, i, err
 }
 
 func DelByDomain(
 	domain string,
-	ctx context.Context,
-	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
-) (*core.CTStream[*CrtshCTClient], int, error) {
-	return core.DelByDomain(domain, ctx, streams)
+	clients *core.CTClients[*CrtshCTClient],
+) (*CrtshCTClient, int, error) {
+	client, i, err := core.DelByDomain(domain, clients, null)
+	return client, i, err
 }

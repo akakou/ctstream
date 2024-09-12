@@ -6,11 +6,11 @@ import (
 	"github.com/akakou/ctstream/core"
 )
 
-func GetFirst(CTsStream *core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]]) int {
+func GetFirst(ctClients *core.CTClients[*SSLMateCTClient]) int {
 	var first int
 
-	for _, stream := range CTsStream.Streams {
-		tmp, _ := strconv.Atoi(stream.Client.First)
+	for _, client := range ctClients.Clients {
+		tmp, _ := strconv.Atoi(client.First)
 
 		if tmp > first {
 			first = tmp
@@ -20,8 +20,8 @@ func GetFirst(CTsStream *core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClien
 	return first
 }
 
-func SetFirst(first int, CTsStream *core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]]) {
-	for _, stream := range CTsStream.Streams {
-		stream.Client.First = strconv.Itoa(first)
+func SetFirst(first int, ctClients *core.CTClients[*SSLMateCTClient]) {
+	for _, client := range ctClients.Clients {
+		client.First = strconv.Itoa(first)
 	}
 }
