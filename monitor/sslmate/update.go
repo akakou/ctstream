@@ -1,30 +1,31 @@
 package sslmate
 
 import (
-	"context"
-
 	"github.com/akakou/ctstream/core"
 )
 
+func null() *SSLMateCTClient { return nil }
+
 func SelectByDomain(
 	domain string,
-	streams *core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]],
-) (*core.CTStream[*SSLMateCTClient], int, error) {
-	return core.SelectByDomain(domain, streams)
+	clients *core.CTClients[*SSLMateCTClient],
+) (*SSLMateCTClient, int, error) {
+	client, i, err := core.SelectByDomain(domain, clients, null)
+	return client, i, err
 }
 
 func AddByDomain(
 	domain string,
-	ctx context.Context,
-	streams *core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]],
-) (*core.CTStream[*SSLMateCTClient], int, error) {
-	return core.AddByDomain(domain, ctx, DefaultCTStream, streams)
+	clients *core.CTClients[*SSLMateCTClient],
+) (*SSLMateCTClient, int, error) {
+	client, i, err := core.AddByDomain(domain, DefaultCTClient, clients, null)
+	return client, i, err
 }
 
 func DelByDomain(
 	domain string,
-	ctx context.Context,
-	streams *core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]],
-) (*core.CTStream[*SSLMateCTClient], int, error) {
-	return core.DelByDomain(domain, ctx, streams)
+	clients *core.CTClients[*SSLMateCTClient],
+) (*SSLMateCTClient, int, error) {
+	client, i, err := core.DelByDomain(domain, clients, null)
+	return client, i, err
 }

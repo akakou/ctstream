@@ -6,33 +6,20 @@ import (
 	"github.com/akakou/ctstream/core"
 )
 
-func DefaultCTStream(domain string, context context.Context) (*core.CTStream[*CrtshCTClient], error) {
-	client, err := NewCTClient(domain)
+func NewCTsStream(clients *core.CTClients[*CrtshCTClient], ctx context.Context) (*core.CTStream[*core.CTClients[*CrtshCTClient]], error) {
+	return core.NewCTStream(clients, 0, ctx)
+}
+
+func DefaultCTsStream(domains []string, ctx context.Context) (*core.CTStream[*core.CTClients[*CrtshCTClient]], error) {
+	client, err := DefaultCTClients(domains, ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	stream, err := core.NewCTStream(client, core.DefaultEpochSleep, context)
+	stream, err := core.NewCTStream(client, core.DefaultEpochSleep, ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	return stream, nil
-}
-
-func DefaultCTsStream(domains []string, context context.Context) (*core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]], error) {
-	var streams []*core.CTStream[*CrtshCTClient]
-
-	for _, domain := range domains {
-		stream, err := DefaultCTStream(domain, context)
-		if err != nil {
-			return nil, err
-		}
-
-		streams = append(streams, stream)
-	}
-
-	res, err := core.NewConcurrentCTsStream(streams, core.DefaultEpochSleep)
-
-	return res, err
 }
