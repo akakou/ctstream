@@ -33,10 +33,10 @@ func main() {
 		fmt.Printf("%v: %v (target: %v)\n", params.ID, cert.DNSNames, params.Client.Domain)
 	})
 
-	// go func() {
-	// 	time.Sleep(40 * time.Second)
-	// 	m.Stop()
-	// }()
+	go func() {
+		time.Sleep(40 * time.Second)
+		m.Stop()
+	}()
 
 	m.Await()
 }
