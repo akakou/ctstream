@@ -17,7 +17,7 @@ func AddByDomain(
 	domain string,
 	ctx context.Context,
 	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
-) error {
+) (*core.CTStream[*CrtshCTClient], int, error) {
 	return core.AddByDomain(domain, ctx, DefaultCTStream, streams)
 }
 
@@ -25,6 +25,6 @@ func DelByDomain(
 	domain string,
 	ctx context.Context,
 	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
-) error {
+) (*core.CTStream[*CrtshCTClient], int, error) {
 	return core.DelByDomain(domain, ctx, streams)
 }
