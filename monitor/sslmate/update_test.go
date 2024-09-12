@@ -14,14 +14,14 @@ func TestUpdate(t *testing.T) {
 
 	t.Run("TestAdd", func(t *testing.T) {
 		const domain = "test.example.com"
-		_, i, err := AddByDomain(domain, context.Background(), clients)
+		_, i, err := AddByDomain(domain, clients)
 		assert.NoError(t, err)
 		assert.Equal(t, i, 0)
 		assert.Equal(t, len(clients.Clients), 1)
 	})
 
 	t.Run("TestDel", func(t *testing.T) {
-		_, i, err := DelByDomain(domain, context.Background(), clients)
+		_, i, err := DelByDomain(domain, clients)
 		assert.NoError(t, err)
 		assert.Equal(t, i, 0)
 		assert.Equal(t, len(clients.Clients), 0)
