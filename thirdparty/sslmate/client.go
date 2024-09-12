@@ -79,3 +79,7 @@ func (client *SSLMateCTClient) Next(callback core.Callback) {
 		l = len(certs)
 	}
 }
+
+func (client *SSLMateCTClient) GetDomain() string {
+	return client.Domain
+}

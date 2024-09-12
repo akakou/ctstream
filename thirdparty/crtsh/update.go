@@ -1,4 +1,4 @@
-package sslmate
+package crtsh
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 func AddByDomain(
 	domain string,
 	ctx context.Context,
-	streams *core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]],
+	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
 ) error {
 	return thirdparty.AddByDomain(domain, ctx, DefaultCTStream, streams)
 }
@@ -18,7 +18,7 @@ func AddByDomain(
 func DelByDomain(
 	domain string,
 	ctx context.Context,
-	streams *core.ConcurrentCTsStream[*core.CTStream[*SSLMateCTClient]],
+	streams *core.ConcurrentCTsStream[*core.CTStream[*CrtshCTClient]],
 ) error {
 	return thirdparty.DelByDomain(domain, ctx, streams)
 }

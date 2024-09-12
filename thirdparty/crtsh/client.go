@@ -43,3 +43,7 @@ func (client *CrtshCTClient) Next(callback core.Callback) {
 		}, err)
 	}
 }
+
+func (client *CrtshCTClient) GetDomain() string {
+	return client.Domain
+}
