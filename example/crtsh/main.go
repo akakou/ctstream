@@ -7,26 +7,19 @@ import (
 	"time"
 
 	"github.com/akakou/ctstream/core"
-	"github.com/akakou/ctstream/thirdparty/sslmate"
-
+	"github.com/akakou/ctstream/thirdparty/crtsh"
 	ctx509 "github.com/google/certificate-transparency-go/x509"
 )
 
 func main() {
 	core.DefaultEpochSleep = time.Second * 10
 
-	m, err := sslmate.DefaultCTsStream([]string{
-		"google.com",
+	m, err := crtsh.DefaultCTsStream([]string{
+		"test2.ochano.co",
 	}, context.Background())
 
 	if err != nil {
 		fmt.Printf("Failed to create new ctstream: ")
-		os.Exit(1)
-	}
-
-	err = m.Init()
-	if err != nil {
-		fmt.Printf("Failed to initialize ctstream: ")
 		os.Exit(1)
 	}
 
@@ -35,9 +28,9 @@ func main() {
 			fmt.Printf("Failed to fetch %v: \n", err)
 		}
 
-		params := opt.(*sslmate.SSLMateCTParams)
+		params := opt.(*crtsh.CrtshCTParams)
 
-		fmt.Printf("%v ~ %v: %v (target: %v)\n", params.Index.First, params.Index.Last, cert.DNSNames, params.Client.Domain)
+		fmt.Printf("%v: %v (target: %v)\n", params.Index, cert.DNSNames, params.Client.Domain)
 	})
 
 	go func() {
@@ -46,6 +39,4 @@ func main() {
 	}()
 
 	m.Await()
-
-	fmt.Printf("last: %v: ", sslmate.GetFirst(m))
 }

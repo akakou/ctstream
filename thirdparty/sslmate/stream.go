@@ -7,9 +7,6 @@ import (
 	"github.com/akakou/ctstream/core"
 )
 
-var DefaultEpochSleep = time.Minute * 20
-var DefaultPullingSleep = time.Second * 10
-
 func NewCTStream(client *SSLMateCTClient, sleep time.Duration, context context.Context) (*core.CTStream[*SSLMateCTClient], error) {
 	return core.NewCTStream(client, sleep, context)
 }
@@ -20,12 +17,12 @@ func DefaultCTStream(domain string, context context.Context) (*core.CTStream[*SS
 		return nil, err
 	}
 
-	stream, err := core.NewCTStream(client, DefaultEpochSleep, context)
+	stream, err := core.NewCTStream(client, core.DefaultEpochSleep, context)
 	if err != nil {
 		return nil, err
 	}
 
-	stream.Sleep = DefaultEpochSleep
+	stream.Sleep = core.DefaultEpochSleep
 
 	return stream, nil
 }
@@ -46,7 +43,7 @@ func DefaultCTsStream(domains []string, context context.Context) (*core.Concurre
 		streams = append(streams, stream)
 	}
 
-	res, err := core.NewConcurrentCTsStream(streams, DefaultEpochSleep)
+	res, err := core.NewConcurrentCTsStream(streams, core.DefaultEpochSleep)
 
 	return res, err
 }
