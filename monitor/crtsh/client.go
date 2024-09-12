@@ -46,6 +46,7 @@ func (client *CrtshCTClient) Next(callback core.Callback) {
 			Client: client,
 		}, err)
 
+		client.ID = entry.ID
 	}
 }
 
