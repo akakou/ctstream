@@ -100,3 +100,7 @@ func (stream *CTClient) Next(callback core.Callback) {
 
 	stream.first = treeSize
 }
+
+func (stream *CTClient) GetDomain() string {
+	return stream.Url
+}

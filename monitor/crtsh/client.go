@@ -24,12 +24,12 @@ func NewCTClient(domain string) (*CrtshCTClient, error) {
 }
 
 func (client *CrtshCTClient) Init() error {
-	_, err := crtsh.Fetch(client.Domain, "expired")
+	_, err := crtsh.Fetch(client.Domain, crtsh.EXCLUDE_EXPIRED)
 	return err
 }
 
 func (client *CrtshCTClient) Next(callback core.Callback) {
-	entries, err := crtsh.Fetch(client.Domain, "expired")
+	entries, err := crtsh.Fetch(client.Domain, crtsh.EXCLUDE_EXPIRED)
 	if err != nil {
 		callback(nil, 0, &CrtshCTParams{}, err)
 		return
