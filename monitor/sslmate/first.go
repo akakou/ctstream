@@ -1,8 +1,6 @@
 package sslmate
 
 import (
-	"strconv"
-
 	"github.com/akakou/ctstream/core"
 )
 
@@ -10,7 +8,7 @@ func GetFirst(ctClients *core.CTClients[*SSLMateCTClient]) int {
 	var first int
 
 	for _, client := range ctClients.Clients {
-		tmp, _ := strconv.Atoi(client.First)
+		tmp := client.First
 
 		if tmp > first {
 			first = tmp
@@ -22,6 +20,6 @@ func GetFirst(ctClients *core.CTClients[*SSLMateCTClient]) int {
 
 func SetFirst(first int, ctClients *core.CTClients[*SSLMateCTClient]) {
 	for _, client := range ctClients.Clients {
-		client.First = strconv.Itoa(first)
+		client.First = first
 	}
 }
