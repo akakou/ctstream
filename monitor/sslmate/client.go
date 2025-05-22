@@ -59,6 +59,7 @@ func (client *SSLMateCTClient) next() ([]x509.Certificate, *api.Index, error) {
 }
 
 func (client *SSLMateCTClient) Init() error {
+	client.First = ""
 	return nil
 }
 

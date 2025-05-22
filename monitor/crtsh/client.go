@@ -24,8 +24,8 @@ func NewCTClient(domain string) (*CrtshCTClient, error) {
 }
 
 func (client *CrtshCTClient) Init() error {
-	_, err := crtsh.Fetch(client.Domain, crtsh.EXCLUDE_EXPIRED)
-	return err
+	client.ID = 0
+	return nil
 }
 
 func (client *CrtshCTClient) Next(callback core.Callback) {
