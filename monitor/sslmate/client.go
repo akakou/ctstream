@@ -53,7 +53,10 @@ func (client *SSLMateCTClient) fetch() ([]api.SSLMateCertEntry, error) {
 		return nil, fmt.Errorf("%v: %v", ErrrorFailedToSearch, err)
 	}
 
-	client.First = entries[len(entries)-1].Id
+	l := len(entries)
+	if l != 0 {
+		client.First = entries[len(entries)-1].Id
+	}
 	return entries, nil
 }
 
